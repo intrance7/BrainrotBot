@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  discordId   String   @unique
+  username    String
+  createdAt   DateTime @default(now())
+  lastActive  DateTime @default(now())
+
+  stats       UserStats?
+  economy     Economy?
+  inventory   Inventory[]
+}
+
+model UserStats {
+  userId      String   @id
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aura        Int      @default(100)
+  braincells  Int      @default(100)
+  luck        Int      @default(50)
+  sleep       Int      @default(100)
+  coffee      Int      @default(0)
+  touchGrass  Int      @default(0)
+}
+
+model Economy {
+  userId         String   @id
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance        Int      @default(0)
+  lifetimeEarned Int      @default(0)
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id])
+  quantity  Int      @default(1)
+}
+
+model Item {
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  price       Int
+  effect      String
+  inventory   Inventory[]
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  type        String
+  name        String
+  description String
+  effect      String
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  reward      Int
+}
